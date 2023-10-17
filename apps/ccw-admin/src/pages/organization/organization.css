@@ -1,0 +1,19 @@
+.heading{
+
+    height: 100px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.container{
+    margin-top: 15px;
+    margin-left: 650px;
+    font-size: medium;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.content{
+    border: 1px solid #0f0202;
+    background: linear-gradient(rgb(0, 166, 255) , rgb(0, 255, 187));
+}

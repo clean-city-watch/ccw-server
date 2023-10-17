@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev --db postgres --db-url-host <server-ip> --db-username postgres --db-password password --db-url-port 5432 --db-url-database keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8080:8080
+    networks:
+      - keycloak_network
+
+  api:
+    container_name: api
+    build:
+      context: ./
+      cache_from:
+        - ccw:nx-base
+      dockerfile: ./apps/api/Dockerfile
+      args:
+        NODE_ENV: ${API_NODE_ENV}
+        BUILD_FLAG: ${API_BUILD_FLAG}
+    image: api:dev
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: ${API_DATABASE_URL}
+      REALM: ${KEYCLOAK_REALM}
+      CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      USER_NAME: ${KEYCLOAK_USER_NAME}
+      USER_PASSWORD: ${KEYCLOAK_USER_PASSWORD}
+      BASE_URL: http://KEYCLOAK:8080
+      NODE_ENV: ${API_NODE_ENV}
+      PORT: ${API_PORT}
+      CORS_ENV: '*'
+    networks:
+      - keycloak_network
+    restart: on-failure
+
+  client:
+    container_name: client
+    build:
+      context: ./
+      cache_from:
+        - nginx:1.19.2
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        NODE_ENV: ${CLIENT_NODE_ENV}
+        BUILD_FLAG: ${CLIENT_BUILD_FLAG}
+    image: client:dev
+    ports:
+      - 4900:80
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      NODE_ENV: ${CLIENT_NODE_ENV}
+      PORT: ${CLIENT_PORT}
+    depends_on:
+      - api
+    networks:
+      - keycloak_network
+    restart: on-failure
+
+
+networks:
+  keycloak_network:

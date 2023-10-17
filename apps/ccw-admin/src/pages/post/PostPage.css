@@ -1,0 +1,49 @@
+/* PostPage.css */
+
+.post-container {
+    border: 3px solid #ddd;
+    padding: 16px;
+    margin: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .post-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .post-info {
+    margin-top: 16px;
+    text-align: left;
+  }
+  
+  .post-title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .post-content {
+    font-size: 20px;
+    color: #333;
+  }
+  
+  .post-city {
+    font-size: 20px;
+    color: #777;
+  }
+  
+  .post-published {
+    font-size: 20px;
+    color: green;
+  }
+  
+  .post-timestamp {
+    font-size: 20px;
+    color: #888;
+    margin-top: 8px;
+  }
+  
