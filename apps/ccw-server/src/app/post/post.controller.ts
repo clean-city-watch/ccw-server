@@ -4,7 +4,7 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } fr
 import { Express } from 'express';
 import 'multer';
 
-import { FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
+import {  CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
 
 import { PostService } from './post.service';
 
@@ -32,6 +32,24 @@ export default class PostController {
     getallpostsCount() {
         return this.postService.getPostCount();
     }
+
+    
+    @ApiOperation({ summary: 'Create status for Post' })
+    @ApiBody({ type: CreateStatusDto })
+    @ApiResponse({ status: 201, description: 'Success' })
+    @Post('status')
+    postStatusforPost(@Body() createStatusDto: CreateStatusDto) {
+        return this.postService.postStatusForPost(createStatusDto);
+    }
+
+
+    @ApiOperation({ summary: 'get posts count by status' })
+    @ApiResponse({ status: 200, description: 'Success' })
+    @Get('status')
+    getStatusforPost() {
+        return this.postService.getStatuses();
+    }
+
 
     @ApiOperation({ summary: 'get posts count by status' })
     @ApiResponse({ status: 200, description: 'Success' })

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient,Prisma ,Post} from '@prisma/client';
-import { FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
+import { CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
 
 @Injectable()
 export class PostService {
@@ -63,6 +63,18 @@ export class PostService {
       });
     }
 
+
+    postStatusForPost(createStatusDto:CreateStatusDto){
+      return this.prismaService.status.create({
+        data: createStatusDto
+      })
+    }
+
+    getStatuses(){
+      return this.prismaService.status.findMany();
+    }
+
+    
     allpost(){
       return this.prismaService.post.findMany({
         include: {
