@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto, LoginUserResponse } from '../../user/dto/user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor (private configService: ConfigService){}
+    constructor (private configService: ConfigService,private jwtService: JwtService ){}
     private prismaService = new PrismaClient();
 
 
@@ -41,6 +43,77 @@ export class AuthService {
         return true
         
     }
+
+
+
+
+
+    async loginUser(userDto: CreateUserDto): Promise<LoginUserResponse> {
+
+        // const userPassword = await this.authService.hashPassword(userDto.password);
+        // console.log(userPassword);
+        
+        const user =  await this.prismaService.user.findFirst({
+          where:{
+            email: userDto.email
+          },
+          include: {
+            superRoles:{
+              include:{
+                superRole: true,
+              }
+            },
+            organizationRoles: {
+              include: {
+                organizationRole: true,
+                organization:{
+                  select:{
+                    id: true,
+                    name: true
+                  }
+                }
+              },
+            },
+            communityRoles: {
+              include: {
+                communityRole: true,
+                community:{
+                  select:{
+                    id: true,
+                    name: true
+                  }
+                }
+              },
+            },
+          },
+        });
+
+        
+        if(!user) throw new HttpException("User not found",HttpStatus.NOT_FOUND);
+        const usrpass = this.comparePasswords(userDto.password,user.password);
+    
+        if(!usrpass) throw new HttpException("Incorrect password",HttpStatus.NOT_FOUND);
+       
+    
+        const payload = {
+          sub: user.id,
+          email: user.email,
+          roles: {
+            'super': [ ...user.superRoles.map((role)=>role.superRole.id)],
+            'organization': [...user.organizationRoles.map((role) => role.organizationRole.id)],
+            'community': [...user.communityRoles.map((role) => role.communityRole.id)],
+          },
+          timestamp: String(user.timestamp)
+      };
+      console.log(payload)
+        return {
+          id: String(user.id),
+          access_token: await this.jwtService.signAsync(payload),
+        };
+    
+      }
+    
+    
 
 
 

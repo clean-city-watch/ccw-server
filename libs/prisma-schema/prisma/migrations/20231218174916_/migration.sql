@@ -1,3 +1,15 @@
+-- CreateEnum
+CREATE TYPE "SuperRoleName" AS ENUM ('ADMIN', 'MODERATOR', 'VIEWER');
+
+-- CreateEnum
+CREATE TYPE "OrganizationRoleName" AS ENUM ('ADMIN', 'MODERATOR', 'VIEWER');
+
+-- CreateEnum
+CREATE TYPE "CommunityRoleName" AS ENUM ('ADMIN', 'MODERATOR', 'VIEWER');
+
+-- CreateEnum
+CREATE TYPE "PostType" AS ENUM ('POST', 'ISSUE', 'POLL', 'QUESTION');
+
 -- CreateTable
 CREATE TABLE "Community" (
     "id" SERIAL NOT NULL,
@@ -5,6 +17,24 @@ CREATE TABLE "Community" (
     "city" TEXT,
 
     CONSTRAINT "Community_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "community_roles" (
+    "id" SERIAL NOT NULL,
+    "name" "CommunityRoleName" NOT NULL,
+
+    CONSTRAINT "community_roles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users_community_roles" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "community_role_id" INTEGER NOT NULL,
+    "community_id" INTEGER NOT NULL,
+
+    CONSTRAINT "users_community_roles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -26,12 +56,38 @@ CREATE TABLE "Organization" (
 );
 
 -- CreateTable
-CREATE TABLE "UserCommunity" (
+CREATE TABLE "organization_roles" (
+    "id" SERIAL NOT NULL,
+    "name" "OrganizationRoleName" NOT NULL,
+
+    CONSTRAINT "organization_roles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users_organization_roles" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "community_id" INTEGER NOT NULL,
+    "organization_role_id" INTEGER NOT NULL,
+    "organization_id" INTEGER NOT NULL,
 
-    CONSTRAINT "UserCommunity_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "users_organization_roles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "super_roles" (
+    "id" SERIAL NOT NULL,
+    "name" "SuperRoleName" NOT NULL,
+
+    CONSTRAINT "super_roles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users_super_roles" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "super_role_id" INTEGER NOT NULL,
+
+    CONSTRAINT "users_super_roles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -40,7 +96,6 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "timestamp" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "organization_id" INTEGER,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -72,6 +127,9 @@ CREATE TABLE "posts" (
     "status_id" INTEGER NOT NULL,
     "timestamp" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "author_id" INTEGER NOT NULL,
+    "type" "PostType" NOT NULL,
+    "organization_id" INTEGER,
+    "community_id" INTEGER,
 
     CONSTRAINT "posts_pkey" PRIMARY KEY ("id")
 );
@@ -136,7 +194,16 @@ CREATE TABLE "logs" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "community_roles_name_key" ON "community_roles"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Organization_email_key" ON "Organization"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "organization_roles_name_key" ON "organization_roles"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "super_roles_name_key" ON "super_roles"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
@@ -151,13 +218,28 @@ CREATE UNIQUE INDEX "statuses_name_key" ON "statuses"("name");
 CREATE UNIQUE INDEX "green_coins_user_id_key" ON "green_coins"("user_id");
 
 -- AddForeignKey
-ALTER TABLE "UserCommunity" ADD CONSTRAINT "UserCommunity_community_id_fkey" FOREIGN KEY ("community_id") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users_community_roles" ADD CONSTRAINT "users_community_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserCommunity" ADD CONSTRAINT "UserCommunity_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users_community_roles" ADD CONSTRAINT "users_community_roles_community_role_id_fkey" FOREIGN KEY ("community_role_id") REFERENCES "community_roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "users_community_roles" ADD CONSTRAINT "users_community_roles_community_id_fkey" FOREIGN KEY ("community_id") REFERENCES "Community"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users_organization_roles" ADD CONSTRAINT "users_organization_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users_organization_roles" ADD CONSTRAINT "users_organization_roles_organization_role_id_fkey" FOREIGN KEY ("organization_role_id") REFERENCES "organization_roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users_organization_roles" ADD CONSTRAINT "users_organization_roles_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users_super_roles" ADD CONSTRAINT "users_super_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users_super_roles" ADD CONSTRAINT "users_super_roles_super_role_id_fkey" FOREIGN KEY ("super_role_id") REFERENCES "super_roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -167,6 +249,12 @@ ALTER TABLE "posts" ADD CONSTRAINT "posts_status_id_fkey" FOREIGN KEY ("status_i
 
 -- AddForeignKey
 ALTER TABLE "posts" ADD CONSTRAINT "posts_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "posts" ADD CONSTRAINT "posts_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "posts" ADD CONSTRAINT "posts_community_id_fkey" FOREIGN KEY ("community_id") REFERENCES "Community"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "upvotes" ADD CONSTRAINT "upvotes_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;

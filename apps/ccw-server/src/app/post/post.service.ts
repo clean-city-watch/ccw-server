@@ -415,6 +415,7 @@ export class PostService {
       // const imageurl = data.file.filename;
       const imageurl = 'test 1 file'
       // console.log(imageurl);
+      console.log(data);
 
       const newPost = await this.prismaService.post.create({
         data:{
@@ -426,7 +427,8 @@ export class PostService {
             latitude: parseFloat(data.latitude),
             longitude: parseFloat(data.longitude),
             published: Boolean(data.published),
-            authorId: Number(data.authorId)
+            authorId: Number(data.authorId),
+            type: data.type
         },
       });
       if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);

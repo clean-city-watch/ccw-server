@@ -27,16 +27,20 @@ export class OrganizationService {
           id: id
         },
         include:{
-          user:{
+          users:{
             select:{
-              id: true,
-              email: false,
-              password: false,
-              profile:{
+              user:{
                 select:{
-                  firstName: true,
-                  LastName: true,
-                  avatar: true
+                  id: true,
+                  email: false,
+                  password: false,
+                  profile:{
+                    select:{
+                      firstName: true,
+                      LastName: true,
+                      avatar: true
+                    }
+                  }
                 }
               }
             }

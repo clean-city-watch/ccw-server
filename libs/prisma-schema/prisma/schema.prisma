@@ -8,12 +8,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SuperRoleName {
+  ADMIN
+  MODERATOR
+  VIEWER
+}
+
+enum OrganizationRoleName {
+  ADMIN
+  MODERATOR
+  VIEWER
+}
+
+enum CommunityRoleName {
+  ADMIN
+  MODERATOR
+  VIEWER
+}
+
+enum PostType {
+  POST
+  ISSUE
+  POLL
+  QUESTION
+}
 
 model Community{
   id    Int           @default(autoincrement()) @id  @map("id")
   name         String?
   city         String?
-  users        UserCommunity[]
+  users        UserCommunityRole[]
+  posts        Post[]
+}
+
+model CommunityRole {
+  id    Int                    @id @default(autoincrement())
+  name  CommunityRoleName   @unique
+  users UserCommunityRole[]
+
+  @@map("community_roles")
+}
+
+model UserCommunityRole {
+  id                 Int              @id @default(autoincrement())
+  userId             Int              @map("user_id")
+  communityRoleId Int              @map("community_role_id")
+  communityId     Int              @map("community_id")
+  user               User             @relation(fields: [userId], references: [id])
+  communityRole   CommunityRole @relation(fields: [communityRoleId], references: [id])
+  community       Community     @relation(fields: [communityId], references: [id])
+
+  @@map("users_community_roles")
 }
 
 
@@ -32,18 +77,47 @@ model Organization{
   countryCode  String?                 @map("country_code")
   stateCode    String?                @map("state_code")
   logo         String
-  user         User[]
+  users        UserOrganizationRole[]
+  posts        Post[]
   
 }
 
-model UserCommunity{
-  
-  id    Int           @default(autoincrement()) @id  @map("id")
-  userId  Int @map("user_id")
-  communityId Int @map("community_id")
-  community       Community     @relation(fields: [communityId], references: [id])
-  user             User        @relation(fields: [userId],references: [id])
+model OrganizationRole {
+  id    Int                    @id @default(autoincrement())
+  name  OrganizationRoleName   @unique
+  users UserOrganizationRole[]
 
+  @@map("organization_roles")
+}
+
+model UserOrganizationRole {
+  id                 Int              @id @default(autoincrement())
+  userId             Int              @map("user_id")
+  organizationRoleId Int              @map("organization_role_id")
+  organizationId     Int              @map("organization_id")
+  user               User             @relation(fields: [userId], references: [id])
+  organizationRole   OrganizationRole @relation(fields: [organizationRoleId], references: [id])
+  organization       Organization     @relation(fields: [organizationId], references: [id])
+
+  @@map("users_organization_roles")
+}
+
+model SuperRole {
+  id    Int             @id @default(autoincrement())
+  name  SuperRoleName   @unique
+  users UserSuperRole[]
+
+  @@map("super_roles")
+}
+
+model UserSuperRole {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  superRoleId Int       @map("super_role_id")
+  user        User      @relation(fields: [userId], references: [id])
+  superRole   SuperRole @relation(fields: [superRoleId], references: [id])
+
+  @@map("users_super_roles")
 }
 
 model User {
@@ -54,9 +128,9 @@ model User {
   
   profile UserProfile?
   coins   GreenCoin?
-  organizationId   Int?   @map("organization_id")
-  organization       Organization?     @relation(fields: [organizationId], references: [id])
-  communities         UserCommunity[]
+  superRoles        UserSuperRole[]
+  organizationRoles UserOrganizationRole[]
+  communityRoles UserCommunityRole[]
   logs   Log[]
   posts Post[]
   comments  Comment[]
@@ -97,12 +171,21 @@ model Post {
   statusId  Int      @map("status_id")
   timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz() 
   authorId  Int      @map("author_id")
+  type      PostType @map("type")
+  organizationId  Int?      @map("organization_id")
+  communityId  Int?      @map("community_id")
+
   comments  Comment[]
   upvotes   Upvote[]
+  // coords    Unsupported("geometry")?
+  //  @@index([coords], map: "idx_posts_coords", type: Gist)
 
   status   Status     @relation(fields: [statusId], references: [id])
   author    User?    @relation(fields: [authorId], references: [id],onDelete: Cascade)
-
+  organization    Organization?    @relation(fields: [organizationId], references: [id],onDelete: Cascade)
+  community    Community?    @relation(fields: [communityId], references: [id],onDelete: Cascade)
+  
+ 
   @@map("posts")
 }
 
@@ -173,3 +256,12 @@ model Log {
 
   @@map("logs")
 }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+// model spatial_ref_sys {
+//   srid      Int     @id
+//   auth_name String? @db.VarChar(256)
+//   auth_srid Int?
+//   srtext    String? @db.VarChar(2048)
+//   proj4text String? @db.VarChar(2048)
+// }

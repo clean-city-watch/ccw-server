@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseFilePipeBuilder, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseFilePipeBuilder, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
@@ -7,6 +7,11 @@ import 'multer';
 import {  CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
 
 import { PostService } from './post.service';
+
+import { AuthGuard } from '../core/auth/auth.guard';
+import { RolesGuard } from '../core/auth/roles.guard';
+import { Roles } from '../core/auth/roles.decorator';
+import { Role } from '../core/auth/roles.enum';
 
 @ApiTags('post')
 @Controller('post')
@@ -75,6 +80,8 @@ export default class PostController {
 
     
     @ApiOperation({ summary: 'filter post by string' })
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.ADMIN)
     @ApiResponse({ status: 200, description: 'Success', type: [PostResponseDto] })
     @Get('filtered-posts')
     async getFilteredPosts(

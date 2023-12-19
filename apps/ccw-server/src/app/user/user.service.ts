@@ -193,37 +193,7 @@ export class UserService {
     });
   }
   
-  async loginUser(userDto: CreateUserDto): Promise<LoginUserResponse> {
-
-    // const userPassword = await this.authService.hashPassword(userDto.password);
-    // console.log(userPassword);
-    
-    const user =  await this.prismaService.user.findFirst({
-      where:{
-        email: userDto.email
-      },
-    });
-    
-    if(!user) throw new HttpException("User not found",HttpStatus.NOT_FOUND);
-    const usrpass = this.authService.comparePasswords(userDto.password,user.password);
-
-    if(!usrpass) throw new HttpException("Incorrect password",HttpStatus.NOT_FOUND);
-    const user_profile = await this.prismaService.userProfile.findFirst({
-      where: {
-        userId: user.id
-      }
-    })
-    
-    if(!user_profile) throw new HttpException("profile not found while login",HttpStatus.NOT_FOUND);
-    
-    return {
-        id: String(user.id),
-        email: user.email,
-        timestamp: String(user.timestamp)
-    }
-  }
-
-
+  
   
   async getAllCount(userid: number){
 

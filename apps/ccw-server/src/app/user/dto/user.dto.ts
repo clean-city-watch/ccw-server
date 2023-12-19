@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiOperation, ApiProperty } from "@nestjs/swagger";
 
 
 export class CreateUserDto {
@@ -14,6 +14,7 @@ export class UserResponseDto{
 
 export class LoginUserResponse{
     @ApiProperty() id: string
-    @ApiProperty()  email: string
-    @ApiProperty() timestamp: string
+    @ApiProperty() access_token: string
+    // @ApiProperty()  email: string
+    // @ApiProperty() timestamp: string
 }

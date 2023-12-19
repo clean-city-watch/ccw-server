@@ -8,6 +8,7 @@ import {
     Delete,
     HttpCode,
     HttpStatus,
+    UseGuards,
   } from '@nestjs/common';
 import {
     ApiBody,
@@ -19,6 +20,11 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto, LoginUserResponse, UserResponseDto } from './dto/user.dto';
 import { CreateMemberDto } from './dto/create-member.dto';
+import { AuthGuard } from '../core/auth/auth.guard';
+import { RolesGuard } from '../core/auth/roles.guard';
+import { Roles } from '../core/auth/roles.decorator';
+import { Role } from '../core/auth/roles.enum';
+
 
 
 @ApiTags('user')
@@ -33,8 +39,8 @@ export class UserController {
         return this.userService.Keycloak_getUsers();
     }
 
-
-
+    @UseGuards(AuthGuard,RolesGuard)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: 'Get all the users' })
     @ApiResponse({ status: 200, description: 'Success', type: [UserResponseDto] })    
     @Get()
@@ -122,25 +128,6 @@ export class UserController {
      {
         return this.userService.signinUser_Keycloak(member);
     }
-
-
-    @ApiOperation({ summary: 'Login user' })
-    @ApiBody({ type: CreateUserDto })
-    @ApiResponse({
-        status: 201,
-        description: 'Success',
-        type: UserResponseDto,
-    })
-    @HttpCode(HttpStatus.CREATED)
-    @Post('signin')
-    async signinUser(
-        @Body() userData: CreateUserDto,
-    ): Promise<LoginUserResponse> {
-        return this.userService.loginUser(userData);
-    }
-
-
-    //TODO : put method to change user password or forgot password.
 
 
     @ApiOperation({ summary: 'Delete user' })

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PostType } from '@prisma/client';
 
 // export class PostFindManyDto{
 //     skip?: number;
@@ -17,6 +18,9 @@ export class PostCreateDto {
   @ApiProperty() latitude: string;
   @ApiProperty() longitude: string;
   @ApiProperty() authorId: number;
+  @ApiProperty() type: PostType;
+  @ApiProperty() organizationId?: number;
+  @ApiProperty() communityId?: number;
 }
 
 export class PostResponseDto {
