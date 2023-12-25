@@ -52,3 +52,17 @@ export class FilterPostsResponseDto {
 export class CreateStatusDto {
   @ApiProperty() name: string;
 }
+
+
+
+
+
+export class PostEditDto {
+  @ApiProperty() id: number;
+  @ApiProperty() title: string;
+  @ApiProperty() content: string;
+  @ApiProperty() city: string;
+  @ApiProperty() latitude: string;
+  @ApiProperty() longitude: string;
+  }
+

@@ -4,7 +4,7 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } fr
 import { Express } from 'express';
 import 'multer';
 
-import {  CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
+import {  CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostEditDto, PostResponseDto } from './dto/post.dto';
 
 import { PostService } from './post.service';
 
@@ -27,8 +27,8 @@ export default class PostController {
     @ApiOperation({ summary: 'Get all locations' })
     @ApiResponse({ status: 200, description: 'Success',  })
     @Get('/all-locations')
-    getallLocations()  {
-        return this.postService.getLatLangs();
+    getallLocations( @Query('city') city?: string,)  {
+        return this.postService.getLatLangs(city);
     }
 
     @ApiOperation({ summary: 'get posts count' })
@@ -187,6 +187,24 @@ export default class PostController {
       
         // return this.postService.createPost(postData,file);
     }
+
+
+    @ApiOperation({ summary: 'Edit post' })
+    @ApiBody({ type: PostCreateDto })
+    @ApiResponse({
+        status: 202,
+        description: 'Accepted',
+        type: PostResponseDto,
+    })
+    @HttpCode(HttpStatus.ACCEPTED)
+    @Put()
+    async editPost(
+        @Body() postData: PostEditDto,
+    ): Promise<PostResponseDto> {
+        console.log(postData);
+        return this.postService.editPost(postData);
+    }
+
 
 
 

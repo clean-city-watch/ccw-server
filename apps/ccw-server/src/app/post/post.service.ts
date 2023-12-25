@@ -1,15 +1,53 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient,Prisma ,Post} from '@prisma/client';
-import { CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostResponseDto } from './dto/post.dto';
+import { CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostEditDto, PostResponseDto } from './dto/post.dto';
 
 @Injectable()
 export class PostService {
     private prismaService = new PrismaClient()
 
 
-    async getLatLangs(){
+    async getLatLangs(city: string){
+      
+
+      const allPostforCity = await this.prismaService.post.count({
+        where:{
+          city: city !==undefined ? city: "Pune"
+        }
+      })
+
+      
+      const allResolvedcountforCity = await this.prismaService.post.count({
+        where:{
+          city: city !==undefined ? city: "Pune",
+          status:{
+            name: 'Resolved'
+          }
+        }
+      })
+
+      const allinProgresscountforCity = await this.prismaService.post.count({
+        where:{
+          city:city !==undefined ? city: "Pune",
+          status:{
+            id: 2
+          }
+        }
+      })
+
+      const allOpencountforCity = await this.prismaService.post.count({
+        where:{
+          city:city !==undefined ? city: "Pune",
+          status:{
+            id: 1
+          }
+        }
+      })
 
       const latlangs = await this.prismaService.post.findMany({
+        where:{
+          city:city !==undefined ? city: "Pune"
+        },
         select:{
           latitude: true,
           longitude: true
@@ -21,7 +59,13 @@ export class PostService {
 
         return [value.latitude,value.longitude];
       })
-      return result; 
+      return {
+        'content': result,
+        'all': allPostforCity,
+        'open': allOpencountforCity,
+        'inprogress': allinProgresscountforCity,
+        'resolved': allResolvedcountforCity
+      }; 
     }
 
 
@@ -444,7 +488,25 @@ export class PostService {
     
     }
 
+    async editPost(postData: PostEditDto){
+        const {id , ...data} = postData;
 
+        const editedPost = await this.prismaService.post.update({
+          where:{
+            id: Number((id))
+          },
+          data:{
+            title: data.title,
+            content: data.content,
+            city: data.city,
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
+          }
+        })
+
+        
+        return editedPost;
+    }
   
     async updatePost(params: {
       where: Prisma.PostWhereUniqueInput;
