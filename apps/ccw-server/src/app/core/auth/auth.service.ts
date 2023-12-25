@@ -4,10 +4,11 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, LoginUserResponse } from '../../user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { NotificationService } from '../../notification/notification.service';
 
 @Injectable()
 export class AuthService {
-    constructor (private configService: ConfigService,private jwtService: JwtService ){}
+    constructor (private configService: ConfigService,private jwtService: JwtService, private readonly notificationService: NotificationService ){}
     private prismaService = new PrismaClient();
 
 
@@ -106,6 +107,7 @@ export class AuthService {
           timestamp: String(user.timestamp)
       };
       console.log(payload)
+      // await this.notificationService.sendEmail('yash.p@hofintech.com','login test','login success!');
         return {
           id: String(user.id),
           access_token: await this.jwtService.signAsync(payload),

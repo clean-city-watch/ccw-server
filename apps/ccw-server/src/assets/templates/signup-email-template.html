@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCW Application Sign-Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border: 2px solid #28a745; /* Green border */
+      border-radius: 8px;
+    }
+
+    h1 {
+      color: #28a745; /* Green text */
+    }
+
+    p {
+      color: #333;
+    }
+
+    .otp {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+
+    .disclaimer {
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to CCW Application, {{ firstName }} {{ lastName }}!</h1>
+    <p>Dear {{ firstName }},</p>
+    <p>Thank you for signing up with CCW Application. To complete your registration, please verify your email by entering the following OTP:</p>
+    <p class="otp">{{ otp }}</p>
+    <p>This OTP is valid for a limited time. Please do not share it with anyone.</p>
+    <!-- Add more content as needed -->
+    <p class="disclaimer">If you did not sign up for CCW Application, please disregard this email.</p>
+  </div>
+</body>
+</html>

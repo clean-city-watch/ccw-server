@@ -6,6 +6,7 @@ import { CreateMemberDto } from './dto/create-member.dto';
 // import * as bcrypt from "bcrypt";
 import { CreateUserDto, LoginUserResponse, UserResponseDto } from './dto/user.dto';
 import { keycloakAdminClient } from '../keycloak/keycloak';
+import { SuperRoleName } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -84,6 +85,19 @@ export class UserService {
       data:{
         userId: Number(user.id),
         coins: 0
+      }
+    })
+
+    const userRole = await this.prismaService.superRole.findFirst({
+      where:{
+        name: SuperRoleName.ADMIN
+      }
+    })
+
+    const userSuper = await this.prismaService.userSuperRole.create({
+      data:{
+        userId: Number(user.id),
+        superRoleId: userRole.id
       }
     })
 

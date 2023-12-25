@@ -17,6 +17,9 @@ import { LeadboardService } from './leadboard/leadboard.service';
 import { GreenCoinService } from './green-coin/green-coin.service';
 import { OrganizationController } from './organization/organization.controller';
 import { OrganizationService } from './organization/organization.service';
+import { NotificationModule } from './notification/notification.module';
+import { MinioService } from './minio/minio.service';
+import { MinioModule } from './minio/minio.module';
 
 @Module({
   imports: [
@@ -27,6 +30,8 @@ import { OrganizationService } from './organization/organization.service';
     FeedbackModule,
     CommentModule,
     UpvoteModule,
+    NotificationModule,
+    MinioModule,
   ],
   controllers: [
     AppController,

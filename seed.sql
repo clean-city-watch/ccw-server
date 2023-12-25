@@ -8,6 +8,7 @@ insert into statuses (name) values ('Invalid');
 insert into statuses (name) values ('Blocked');
 
 INSERT INTO public.users(email,  password) VALUES ( 'admin@gmail.com', '$2b$10$ObLxqeKtG0bSmrDLyI64Y.L.LJe/k33g4sVFsft5gDmHYId7uH/7G');
+INSERT INTO public.user_profiles (user_id) VALUES (1);
 
 INSERT INTO public.super_roles(name) VALUES ( 'ADMIN');
 INSERT INTO public.super_roles(name) VALUES ( 'MODERATOR');

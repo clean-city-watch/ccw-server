@@ -7,19 +7,23 @@ import { RolesGuard } from './roles.guard';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { NotificationModule } from '../../notification/notification.module';
+import { NotificationService } from '../../notification/notification.service';
 
 @Module({
   imports: [
+    
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
       signOptions: { expiresIn: process.env.JWT_EXPIRE_IN },
-    }),
+    })
   ],
   providers: [
     AuthService,
     ConfigService,
     AuthGuard,
+    NotificationService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

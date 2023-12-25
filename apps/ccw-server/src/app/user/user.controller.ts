@@ -24,6 +24,7 @@ import { AuthGuard } from '../core/auth/auth.guard';
 import { RolesGuard } from '../core/auth/roles.guard';
 import { Roles } from '../core/auth/roles.decorator';
 import { Role } from '../core/auth/roles.enum';
+import { Public } from '../core/auth/public.decorator';
 
 
 
@@ -40,7 +41,7 @@ export class UserController {
     }
 
     @UseGuards(AuthGuard,RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN,Role.VIEWER)
     @ApiOperation({ summary: 'Get all the users' })
     @ApiResponse({ status: 200, description: 'Success', type: [UserResponseDto] })    
     @Get()
@@ -78,7 +79,7 @@ export class UserController {
     
 
 
-
+    @Public()
     @ApiOperation({ summary: 'Create user' })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({

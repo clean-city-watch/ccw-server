@@ -9,6 +9,7 @@ export class CommentService {
   private prismaService = new PrismaClient();
 
   create(createCommentDto: CreateCommentDto) {
+    console.log(createCommentDto);
     const user = this.prismaService.user.findUnique({where:{
       id: createCommentDto.userId
     }})

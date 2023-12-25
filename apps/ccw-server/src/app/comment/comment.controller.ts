@@ -8,19 +8,26 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiParam, ApiTags, ApiBody } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
+import { AuthGuard } from '../core/auth/auth.guard';
+import { RolesGuard } from '../core/auth/roles.guard';
+import { Roles } from '../core/auth/roles.decorator';
+import { Role } from '../core/auth/roles.enum';
+import { Public } from '../core/auth/public.decorator';
 
 @ApiTags('comment')
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @ApiOperation({ summary: 'Create post' })
+  @Public()
+  @ApiOperation({ summary: 'Create comment' })
   @ApiBody({ type: CreateCommentDto })
   @ApiResponse({
       status: HttpStatus.CREATED,

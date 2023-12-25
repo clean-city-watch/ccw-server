@@ -2,7 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -33,16 +32,16 @@ enum PostType {
   QUESTION
 }
 
-model Community{
-  id    Int           @default(autoincrement()) @id  @map("id")
-  name         String?
-  city         String?
-  users        UserCommunityRole[]
-  posts        Post[]
+model Community {
+  id    Int                 @id @default(autoincrement()) @map("id")
+  name  String?
+  city  String?
+  users UserCommunityRole[]
+  posts Post[]
 }
 
 model CommunityRole {
-  id    Int                    @id @default(autoincrement())
+  id    Int                 @id @default(autoincrement())
   name  CommunityRoleName   @unique
   users UserCommunityRole[]
 
@@ -50,36 +49,33 @@ model CommunityRole {
 }
 
 model UserCommunityRole {
-  id                 Int              @id @default(autoincrement())
-  userId             Int              @map("user_id")
-  communityRoleId Int              @map("community_role_id")
-  communityId     Int              @map("community_id")
-  user               User             @relation(fields: [userId], references: [id])
+  id              Int           @id @default(autoincrement())
+  userId          Int           @map("user_id")
+  communityRoleId Int           @map("community_role_id")
+  communityId     Int           @map("community_id")
+  user            User          @relation(fields: [userId], references: [id])
   communityRole   CommunityRole @relation(fields: [communityRoleId], references: [id])
   community       Community     @relation(fields: [communityId], references: [id])
 
   @@map("users_community_roles")
 }
 
-
-
-model Organization{
-
-  id    Int           @default(autoincrement()) @id  @map("id")
+model Organization {
+  id           Int                    @id @default(autoincrement()) @map("id")
   name         String
   type         String?
   email        String                 @unique
   phoneNumber  String?                @map("phone_number")
-  addressLine1 String?                 @map("address_line_1")
+  addressLine1 String?                @map("address_line_1")
   addressLine2 String?                @map("address_line_2")
   city         String
-  postalCode   String?                 @map("postal_code")
-  countryCode  String?                 @map("country_code")
+  postalCode   String?                @map("postal_code")
+  countryCode  String?                @map("country_code")
   stateCode    String?                @map("state_code")
+  otp          String?                @map("otp")
   logo         String
   users        UserOrganizationRole[]
   posts        Post[]
-  
 }
 
 model OrganizationRole {
@@ -121,138 +117,134 @@ model UserSuperRole {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id  @map("id")
-  email String  @unique @map("email")
-  password  String @map("password")
+  id        Int      @id @default(autoincrement()) @map("id")
+  email     String   @unique @map("email")
+  password  String   @map("password")
+  otp       String?  @map("otp")
   timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz()
-  
-  profile UserProfile?
-  coins   GreenCoin?
+
+  profile           UserProfile?
+  coins             GreenCoin?
   superRoles        UserSuperRole[]
   organizationRoles UserOrganizationRole[]
-  communityRoles UserCommunityRole[]
-  logs   Log[]
-  posts Post[]
-  comments  Comment[]
-  upvotes   Upvote[]
-  feedbacks UserFeedBack[]
+  communityRoles    UserCommunityRole[]
+  logs              Log[]
+  posts             Post[]
+  comments          Comment[]
+  upvotes           Upvote[]
+  feedbacks         UserFeedBack[]
 
   @@map("users")
 }
 
-
 model UserProfile {
-   id Int  @default(autoincrement()) @id @map("id")
-   firstName  String? @map("first_name")
-   LastName  String? @map("last_name")
-   phoneNumber String? @map("phone_number")
-   addressLine1 String? @map("address_line_1")
-   addressLine2 String? @map("address_line_2")
-   avatar String? @map("avatar")
-   
-   userId Int @unique @map("user_id")
+  id           Int     @id @default(autoincrement()) @map("id")
+  firstName    String? @map("first_name")
+  LastName     String? @map("last_name")
+  phoneNumber  String? @map("phone_number")
+  addressLine1 String? @map("address_line_1")
+  addressLine2 String? @map("address_line_2")
+  avatar       String? @map("avatar")
 
-   user    User    @relation(fields: [userId], references: [id],onDelete: Cascade)
-   @@map("user_profiles")
-   
+  userId Int @unique @map("user_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
 }
 
-
-
 model Post {
-  id        Int      @default(autoincrement()) @id @map("id")
-  title     String @map("title")
-  content   String? @map("content")
-  imageUrl  String  @map("image_url")
-  city      String  @map("city")
-  latitude  Float   @map("latitude")
-  longitude Float   @map("longitude")
-  published Boolean? @default(false) @map("published")
-  statusId  Int      @map("status_id")
-  timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz() 
-  authorId  Int      @map("author_id")
-  type      PostType @map("type")
-  organizationId  Int?      @map("organization_id")
-  communityId  Int?      @map("community_id")
+  id             Int      @id @default(autoincrement()) @map("id")
+  title          String   @map("title")
+  content        String?  @map("content")
+  imageUrl       String   @map("image_url")
+  city           String   @map("city")
+  latitude       Float    @map("latitude")
+  longitude      Float    @map("longitude")
+  published      Boolean? @default(false) @map("published")
+  statusId       Int      @map("status_id")
+  timestamp      DateTime @default(now()) @map("timestamp") @db.Timestamptz()
+  authorId       Int      @map("author_id")
+  type           PostType @map("type")
+  organizationId Int?     @map("organization_id")
+  communityId    Int?     @map("community_id")
 
-  comments  Comment[]
-  upvotes   Upvote[]
+  comments Comment[]
+  upvotes  Upvote[]
   // coords    Unsupported("geometry")?
   //  @@index([coords], map: "idx_posts_coords", type: Gist)
 
-  status   Status     @relation(fields: [statusId], references: [id])
-  author    User?    @relation(fields: [authorId], references: [id],onDelete: Cascade)
-  organization    Organization?    @relation(fields: [organizationId], references: [id],onDelete: Cascade)
-  community    Community?    @relation(fields: [communityId], references: [id],onDelete: Cascade)
-  
- 
+  status       Status        @relation(fields: [statusId], references: [id])
+  author       User?         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  community    Community?    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
   @@map("posts")
 }
 
 model Status {
-  id      Int       @id @default(autoincrement())
-  name    String
-  posts   Post[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
 
-  @@unique([ name])
+  @@unique([name])
   @@map("statuses")
 }
 
 model Upvote {
-  id        Int      @default(autoincrement()) @id @map("id")
+  id        Int      @id @default(autoincrement()) @map("id")
   postId    Int      @map("post_id")
   userId    Int      @map("user_id")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("upvotes")
 }
 
 model Comment {
-  id        Int      @default(autoincrement()) @id @map("id")
+  id        Int      @id @default(autoincrement()) @map("id")
   postId    Int      @map("post_id")
   userId    Int      @map("user_id")
   content   String   @map("content")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
 
-model UserFeedBack{
-   id        Int      @default(autoincrement()) @id @map("id")
-   rating    Int @map("rating")
-   feedback  String @map("feedback")
-   authorId  Int  @map("author_id")
+model UserFeedBack {
+  id       Int    @id @default(autoincrement()) @map("id")
+  rating   Int    @map("rating")
+  feedback String @map("feedback")
+  authorId Int    @map("author_id")
 
-   author    User   @relation(fields: [authorId], references: [id],onDelete: Cascade)
-   @@map("user_feedbacks")
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("user_feedbacks")
 }
 
-
 model GreenCoin {
-  id         Int      @default(autoincrement()) @id @map("id")
-  userId     Int      @map("user_id") @unique
-  coins      Int      @map("coins")
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @unique @map("user_id")
+  coins     Int      @map("coins")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
-  user       User     @relation(fields: [userId], references: [id])
-  
+  user User @relation(fields: [userId], references: [id])
+
   @@map("green_coins")
 }
 
-
 model Log {
-  id         Int      @default(autoincrement()) @id @map("id")
-  userId     Int      @map("user_id")
-  message    String   @map("message")
-  timestamp  DateTime @default(now()) @map("timestamp") @db.Timestamptz()
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @map("user_id")
+  message   String   @map("message")
+  timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz()
 
-  user       User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("logs")
 }
