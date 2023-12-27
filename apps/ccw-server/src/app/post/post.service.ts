@@ -1,10 +1,39 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient,Prisma ,Post} from '@prisma/client';
 import { CreateStatusDto, FilterPostsResponseDto, PostCreateDto, PostEditDto, PostResponseDto } from './dto/post.dto';
+import { MinioService } from '../minio/minio.service';
 
 @Injectable()
 export class PostService {
+    constructor(private readonly minioService: MinioService){}
+
     private prismaService = new PrismaClient()
+    async updateImage(id: number, file: Express.Multer.File){
+      await this.minioService.createBucketIfNotExists()
+      const post = await this.prismaService.post.findFirst({
+        where:{
+          id: id
+        }
+      })
+
+      if(post.imageUrl!='null'){
+        await this.minioService.deleteFile(post.imageUrl);
+      }
+
+      const fileName = await this.minioService.uploadFile(file);
+      console.log('filename for uploaded file is ', fileName);
+
+      const updatedPost = await this.prismaService.post.update({
+        where:{
+          id: id
+        },
+        data:{
+          imageUrl: fileName
+        }
+      })
+
+      return updatedPost.imageUrl;
+    }
 
 
     async getLatLangs(city: string){
@@ -457,7 +486,7 @@ export class PostService {
       
       //TODO : handle file upload to blob storage and get the imageurl for the post.
       // const imageurl = data.file.filename;
-      const imageurl = 'test 1 file'
+      const imageurl = 'null'
       // console.log(imageurl);
       console.log(data);
 
@@ -479,7 +508,7 @@ export class PostService {
         const updateLog = await this.prismaService.log.create({
           data:{
               userId:Number(data.authorId),
-              message: `Request no ${newPost.id} Opened successfully!`
+              message: `Request no ${newPost.id} Opened!`
           }
       })
       if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);

@@ -15,7 +15,8 @@ export class LogService {
         return this.prismaService.log.findMany({
             where: {
                 userId: Number(userId)
-            }
+            },
+            orderBy: { ['timestamp']: 'desc' }
         })
     }
 

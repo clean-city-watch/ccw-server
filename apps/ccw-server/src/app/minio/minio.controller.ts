@@ -13,6 +13,7 @@ export class MinioController {
     @Post('covers')
     @UseInterceptors(FileInterceptor('file'))
     async uploadBookCover(@UploadedFile() file: Express.Multer.File) {
+      console.log('request reached here...');
       await this.minioService.createBucketIfNotExists()
       const fileName = await this.minioService.uploadFile(file)
       return fileName

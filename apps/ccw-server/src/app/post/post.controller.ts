@@ -12,6 +12,8 @@ import { AuthGuard } from '../core/auth/auth.guard';
 import { RolesGuard } from '../core/auth/roles.guard';
 import { Roles } from '../core/auth/roles.decorator';
 import { Role } from '../core/auth/roles.enum';
+import { Public } from '../core/auth/public.decorator';
+
 
 @ApiTags('post')
 @Controller('post')
@@ -24,6 +26,9 @@ export default class PostController {
     // getPostById(@Param('id') id: string): Promise<PostResponseDto> {
     //     return this.postService.post(+id);
     // }
+
+
+
     @ApiOperation({ summary: 'Get all locations' })
     @ApiResponse({ status: 200, description: 'Success',  })
     @Get('/all-locations')
@@ -222,6 +227,21 @@ export default class PostController {
             where: { id: Number(id) },
             data: { published: true },
         });
+    }
+
+    @Public()
+    @ApiOperation({ summary: 'Update post imageUrl' })
+    @ApiParam({ name: 'id', type: 'string', description: 'Example ID: 1' })
+    @ApiResponse({
+        status: 201,
+        description: 'Success',
+        type: PostResponseDto,
+    })
+    @HttpCode(HttpStatus.CREATED)
+    @UseInterceptors(FileInterceptor('file'))
+    @Put(':id/upload')
+    async uploadImagePost(@Param('id') id: string,@UploadedFile() file: Express.Multer.File) {
+        return this.postService.updateImage(+id,file);
     }
 
 
