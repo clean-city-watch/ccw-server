@@ -64,5 +64,6 @@ export class PostEditDto {
   @ApiProperty() city: string;
   @ApiProperty() latitude: string;
   @ApiProperty() longitude: string;
+  @ApiProperty() imageUrl: string;
   }
 

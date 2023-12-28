@@ -162,8 +162,7 @@ export default class PostController {
 
     @ApiOperation({ summary: 'Create post' })
     @ApiBody({ type: PostCreateDto })
-    // @ApiConsumes('multipart/form-data') // Specify the media type for file upload
-    // @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file'))
     @ApiResponse({
         status: 201,
         description: 'Success',
@@ -173,6 +172,7 @@ export default class PostController {
     @Post()
     async createDraft(
         @Body() postData: PostCreateDto,
+        @UploadedFile() file: Express.Multer.File
         // @UploadedFile(
         //     new ParseFilePipeBuilder()
         //     .addFileTypeValidator({
@@ -188,26 +188,28 @@ export default class PostController {
         // file: Express.Multer.File,
     ): Promise<PostResponseDto> {
         console.log(postData);
-        return this.postService.createPost(postData);
+        return this.postService.createPost(postData,file);
       
         // return this.postService.createPost(postData,file);
     }
 
 
     @ApiOperation({ summary: 'Edit post' })
-    @ApiBody({ type: PostCreateDto })
+    @ApiBody({ type: PostEditDto })
     @ApiResponse({
         status: 202,
         description: 'Accepted',
         type: PostResponseDto,
     })
     @HttpCode(HttpStatus.ACCEPTED)
+    @UseInterceptors(FileInterceptor('file'))
     @Put()
     async editPost(
         @Body() postData: PostEditDto,
+        @UploadedFile() file?: Express.Multer.File
     ): Promise<PostResponseDto> {
         console.log(postData);
-        return this.postService.editPost(postData);
+        return this.postService.editPost(postData,file);
     }
 
 
@@ -232,6 +234,7 @@ export default class PostController {
     @Public()
     @ApiOperation({ summary: 'Update post imageUrl' })
     @ApiParam({ name: 'id', type: 'string', description: 'Example ID: 1' })
+    @ApiBody({ type: PostEditDto })
     @ApiResponse({
         status: 201,
         description: 'Success',
@@ -240,8 +243,8 @@ export default class PostController {
     @HttpCode(HttpStatus.CREATED)
     @UseInterceptors(FileInterceptor('file'))
     @Put(':id/upload')
-    async uploadImagePost(@Param('id') id: string,@UploadedFile() file: Express.Multer.File) {
-        return this.postService.updateImage(+id,file);
+    async uploadImagePost(@Param('id') id: string, @Body() postData: PostEditDto, @UploadedFile() file: Express.Multer.File) {
+        return this.postService.updateImage(+id,postData,file);
     }
 
 

@@ -8,13 +8,15 @@ export class PostService {
     constructor(private readonly minioService: MinioService){}
 
     private prismaService = new PrismaClient()
-    async updateImage(id: number, file: Express.Multer.File){
+    async updateImage(id: number, postData: PostEditDto,file: Express.Multer.File){
+      console.log(postData);
       await this.minioService.createBucketIfNotExists()
       const post = await this.prismaService.post.findFirst({
         where:{
           id: id
         }
       })
+      if(!post) throw new HttpException("post not found", HttpStatus.NOT_FOUND);
 
       if(post.imageUrl!='null'){
         await this.minioService.deleteFile(post.imageUrl);
@@ -480,13 +482,12 @@ export class PostService {
       return this.prismaService.post.count();
     }
   
-   async createPost(data: PostCreateDto): Promise<PostResponseDto> {
+   async createPost(data: PostCreateDto,file: Express.Multer.File): Promise<PostResponseDto> {
 
-    // createPost(data: PostCreateDto,file): Promise<PostResponseDto> {
-      
       //TODO : handle file upload to blob storage and get the imageurl for the post.
       // const imageurl = data.file.filename;
-      const imageurl = 'null'
+      await this.minioService.createBucketIfNotExists();
+      const imageurl = await this.minioService.uploadFile(file);
       // console.log(imageurl);
       console.log(data);
 
@@ -517,21 +518,40 @@ export class PostService {
     
     }
 
-    async editPost(postData: PostEditDto){
-        const {id , ...data} = postData;
+    async editPost(postData: PostEditDto,file: Express.Multer.File){
+      console.log(postData);
+      await this.minioService.createBucketIfNotExists()
+      const post = await this.prismaService.post.findFirst({
+        where:{
+          id: Number(postData.id)
+        }
+      })
+      if(!post) throw new HttpException("post not found", HttpStatus.NOT_FOUND);
 
-        const editedPost = await this.prismaService.post.update({
-          where:{
-            id: Number((id))
-          },
-          data:{
-            title: data.title,
-            content: data.content,
-            city: data.city,
-            latitude: parseFloat(data.latitude),
-            longitude: parseFloat(data.longitude),
-          }
-        })
+      let  fileName = post.imageUrl;
+      if(post.imageUrl!=postData.imageUrl){
+        console.log('inside the delete image method ')
+        await this.minioService.deleteFile(post.imageUrl);
+        fileName = await this.minioService.uploadFile(file);
+      }
+      
+      console.log('filename for uploaded file is ', fileName);
+
+      const {id , ...data} = postData;
+
+      const editedPost = await this.prismaService.post.update({
+        where:{
+          id: Number((id))
+        },
+        data:{
+          title: data.title,
+          content: data.content,
+          city: data.city,
+          imageUrl: fileName,
+          latitude: parseFloat(data.latitude),
+          longitude: parseFloat(data.longitude),
+        }
+      })
 
         
         return editedPost;
