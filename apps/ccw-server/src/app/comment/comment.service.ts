@@ -24,7 +24,7 @@ export class CommentService {
 
     return this.prismaService.comment.create({
       data : {
-        postId: createCommentDto.postId,
+        postId: Number(createCommentDto.postId),
         content: createCommentDto.content,
         userId: Number(createCommentDto.userId)
       }
