@@ -5,6 +5,7 @@ import {
     Post,
     Body,
    // Put,
+    Request,
     Delete,
     HttpCode,
     HttpStatus,
@@ -29,29 +30,23 @@ import { Public } from '../core/auth/public.decorator';
 
 
 @ApiTags('user')
-@Controller('user')
+@Controller()
 export class UserController {
     constructor(private readonly userService: UserService) {}
     
-    @ApiOperation({ summary: 'Get all the users in keycloak' })
-    @ApiResponse({ status: 200, description: 'Success', type: [UserResponseDto] })    
-    @Get('keycloakusers')
-    async Keycloak_getUsers(){
-        return this.userService.Keycloak_getUsers();
-    }
 
     @UseGuards(AuthGuard,RolesGuard)
     @Roles(Role.ADMIN,Role.VIEWER)
     @ApiOperation({ summary: 'Get all the users' })
     @ApiResponse({ status: 200, description: 'Success', type: [UserResponseDto] })    
-    @Get()
+    @Get('all-users')
     async getUsers(): Promise<UserResponseDto[]>{
         return this.userService.users({});
     }
 
     @ApiOperation({ summary: 'Get user count ' })
     @ApiResponse({ status: 200, description: 'Success' })
-    @Get('count')
+    @Get('user/count')
     async getCount(){
         return this.userService.getCount();
     }
@@ -60,24 +55,17 @@ export class UserController {
     @ApiOperation({ summary: 'Get user by id' })
     @ApiParam({ name: 'id', type: 'string', description: 'Example ID: 1' })
     @ApiResponse({ status: 200, description: 'Success', type: UserResponseDto })
-    @Get(':id')
+    @Get('user/:id')
     async getUserById(@Param('id') id:number): Promise<UserResponseDto>{
         return this.userService.user(+id);
     }
 
-
-    
     @ApiOperation({ summary: 'Get all count by id' })
-    @ApiParam({ name: 'userid', type: 'string', description: 'Example ID: 1' })
     @ApiResponse({ status: 200, description: 'Success' })
-    @Get('count/:userid')
-    async getAllCount(@Param('userid') userid:number){
-        return this.userService.getAllCount(+userid);
+    @Get('user/activity/count')
+    async getAllCount(@Request() req){
+        return this.userService.getAllCount(req['user'].sub);
     }
-
-   
-    
-
 
     @Public()
     @ApiOperation({ summary: 'Create user' })
@@ -88,7 +76,7 @@ export class UserController {
         type: UserResponseDto,
     })
     @HttpCode(HttpStatus.CREATED)
-    @Post('signup')
+    @Post('user/signup')
     async signupUser(
         @Body() userData: CreateUserDto,
     ): Promise<UserResponseDto> {
@@ -96,45 +84,10 @@ export class UserController {
     }
 
 
-    @ApiOperation({ summary: 'Create user with keycloak' })
-    @ApiBody({ type: CreateMemberDto })
-    @ApiResponse({
-        status: 201,
-        description: 'Success',
-        type: UserResponseDto,
-    })
-    @HttpCode(HttpStatus.CREATED)
-    @Post('signup-keycloak')
-    async signupUser_Keycloak(
-        @Body() member: CreateMemberDto,
-    )
-    // : Promise<UserResponseDto>
-     {
-        return this.userService.signupUser_Keycloak(member);
-    }
-
-    @ApiOperation({ summary: 'Signin user with keycloak' })
-    @ApiBody({ type: CreateUserDto })
-    @ApiResponse({
-        status: 201,
-        description: 'Success',
-        type: UserResponseDto,
-    })
-    @HttpCode(HttpStatus.CREATED)
-    @Post('signin-keycloak')
-    async signinUser_Keycloak(
-        @Body() member: CreateUserDto,
-    )
-    // : Promise<UserResponseDto>
-     {
-        return this.userService.signinUser_Keycloak(member);
-    }
-
-
     @ApiOperation({ summary: 'Delete user' })
     @ApiParam({ name: 'id', type: 'string', description: 'Example ID: 1' })
     @ApiResponse({ status: 204, description: 'No Content' })
-    @Delete(':id')
+    @Delete('user/:id')
     @HttpCode(HttpStatus.NO_CONTENT)
     deleteUser(@Param('id') id: number) {
         return this.userService.deleteUser({id:Number(id)})

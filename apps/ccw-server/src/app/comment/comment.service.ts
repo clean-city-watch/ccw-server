@@ -8,10 +8,10 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentService {
   private prismaService = new PrismaClient();
 
-  create(createCommentDto: CreateCommentDto) {
+  create(createCommentDto: CreateCommentDto, userId: number) {
     console.log(createCommentDto);
     const user = this.prismaService.user.findUnique({where:{
-      id: createCommentDto.userId
+      id: userId
     }})
     if(!user) throw new  HttpException('user not found',HttpStatus.NOT_FOUND);
 
@@ -26,7 +26,7 @@ export class CommentService {
       data : {
         postId: Number(createCommentDto.postId),
         content: createCommentDto.content,
-        userId: Number(createCommentDto.userId)
+        userId: userId
       }
     })
   }

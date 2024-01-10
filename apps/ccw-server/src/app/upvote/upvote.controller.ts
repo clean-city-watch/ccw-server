@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Request,
   Delete,
   HttpCode,
   HttpStatus,
@@ -29,8 +30,8 @@ export class UpvoteController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createUpvoteDto: CreateUpvoteDto) {
-    return this.upvoteService.create(createUpvoteDto);
+  create(@Body() createUpvoteDto: CreateUpvoteDto, @Request() req) {
+    return this.upvoteService.create(createUpvoteDto, req['user'].sub);
   }
 
 

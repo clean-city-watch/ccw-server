@@ -5,7 +5,6 @@ import { AuthService } from '../core/auth/auth.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 // import * as bcrypt from "bcrypt";
 import { CreateUserDto, LoginUserResponse, UserResponseDto } from './dto/user.dto';
-import { keycloakAdminClient } from '../keycloak/keycloak';
 import { SuperRoleName } from '@prisma/client';
 
 @Injectable()
@@ -107,106 +106,6 @@ export class UserService {
         timestamp: user.timestamp
     }
   }
-
-  async Keycloak_getUsers(){
-    const client = await keycloakAdminClient();
-
-    const allusers = await client.users.find()
-    
-    return allusers;
-  }
-
-
-  async signinUser_Keycloak(userDto:  CreateUserDto){
-    if(userDto){
-      const client = await keycloakAdminClient(userDto.email,userDto.password);
-      return await client.getAccessToken();
-    }
-    throw new HttpException("email or password required", HttpStatus.BAD_REQUEST);
-  }
-
-  
-
-  async signupUser_Keycloak(member: CreateMemberDto){
-    const existCheck=await this.prismaService.user.findFirst({
-      where: {
-        email: member.email
-      }
-    });
-    if(existCheck){
-      return {
-        success:false,
-        status:404,
-        msg: 'User already exists',
-      }
-    }
-
-    try{
-      // const saltOrRounds = 10;
-      // member.password=await bcrypt.hash(password, saltOrRounds);
-
-       const keycloakData={
-         username: member.name,
-         email: member.email,
-         firstName: member.name,
-         lastName: member.name,
-         password: member.password,
-       }
-     const ssoUser= await this.keyCloakRegistration(keycloakData);
-       console.log(ssoUser,'ssoUser Data',keycloakData);
-       if (!ssoUser) {
-         throw new BadRequestException('Registration failed');
-       }
-       return this.prismaService.user.create({
-        data:{
-          email: ssoUser.id,
-          password: member.password
-        }
-       })
-     
-    }catch (error){
-      console.log(error,"error");
-        return {
-          success:false,
-          status:404,
-          msg: "Phone no is already taken",
-        }
-      }
-
-  }
-
-
-
-  async keyCloakRegistration(keyCloakUserData) {
-    const client = await keycloakAdminClient();
-
-    const keycloakUserNameCount = await client.users.count({
-      username: keyCloakUserData.username,
-    });
-    const keycloakUserEmailCount = await client.users.count({
-      email: keyCloakUserData.email,
-    });
-
-    if (keycloakUserNameCount > 0 || keycloakUserEmailCount > 0) {
-      return false;
-    }
-
-    return await client.users.create({
-      username: keyCloakUserData.username,
-      email: keyCloakUserData.email,
-      firstName: keyCloakUserData.first_name,
-      lastName: keyCloakUserData.last_name,
-      enabled: true,
-      credentials: [
-        {
-          type: 'password',
-          value: keyCloakUserData.password,
-          temporary: false,
-        },
-      ],
-    });
-  }
-  
   
   
   async getAllCount(userid: number){

@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Request,
   Delete,
   HttpCode,
   HttpStatus,
@@ -26,7 +27,6 @@ import { Public } from '../core/auth/public.decorator';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Public()
   @ApiOperation({ summary: 'Create comment' })
   @ApiBody({ type: CreateCommentDto })
   @ApiResponse({
@@ -36,8 +36,8 @@ export class CommentController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  create(@Body() createCommentDto: CreateCommentDto, @Request() req) {
+    return this.commentService.create(createCommentDto, req['user'].sub);
   }
 
   @ApiOperation({ summary: 'Get all comments' })
