@@ -272,7 +272,8 @@ export class PostService {
             select: {
               id: true
             }
-          }
+          },
+          polls: true,
         },
         where: whereQuery,
         take: Number(size),
@@ -484,38 +485,94 @@ export class PostService {
   
    async createPost(data: PostCreateDto,file: Express.Multer.File): Promise<PostResponseDto> {
 
-      //TODO : handle file upload to blob storage and get the imageurl for the post.
-      // const imageurl = data.file.filename;
-      await this.minioService.createBucketIfNotExists();
-      const imageurl = await this.minioService.uploadFile(file);
-      // console.log(imageurl);
-      console.log(data);
+      if(data.type=='QUESTION'){
+        console.log('question modal called');
+        const newPost = await this.prismaService.post.create({
+          data:{
+              title: data.title,
+              content: data.content,
+              city: data.city,
+              published: Boolean(data.published),
+              authorId: Number(data.authorId),
+              type: data.type,
+              question: data.question
+          },
+        });
 
-      const newPost = await this.prismaService.post.create({
-        data:{
-            title: data.title,
-            content: data.content,
-            imageUrl: imageurl,
-            city: data.city,
-            statusId: 1,
-            latitude: parseFloat(data.latitude),
-            longitude: parseFloat(data.longitude),
-            published: Boolean(data.published),
-            authorId: Number(data.authorId),
-            type: data.type
-        },
-      });
-      if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+        if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
         const updateLog = await this.prismaService.log.create({
           data:{
               userId:Number(data.authorId),
-              message: `Request no ${newPost.id} Opened!`
+              message: `Question is Posted on app!`
           }
-      })
-      if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+        })
+        if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
 
-      return newPost;
-    
+        return newPost;
+
+      }
+      else if(data.type=='ISSUE'){
+        //TODO : handle file upload to blob storage and get the imageurl for the post.
+        // const imageurl = data.file.filename;
+        await this.minioService.createBucketIfNotExists();
+        const imageurl = await this.minioService.uploadFile(file);
+        // console.log(imageurl);
+        console.log(data);
+
+        const newPost = await this.prismaService.post.create({
+          data:{
+              title: data.title,
+              content: data.content,
+              imageUrl: imageurl,
+              city: data.city,
+              statusId: 1,
+              latitude: parseFloat(data.latitude),
+              longitude: parseFloat(data.longitude),
+              published: Boolean(data.published),
+              authorId: Number(data.authorId),
+              type: data.type
+          },
+        });
+        if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+          const updateLog = await this.prismaService.log.create({
+            data:{
+                userId:Number(data.authorId),
+                message: `Request no ${newPost.id} Opened!`
+            }
+        })
+        if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return newPost;
+
+      }else if(data.type=='POLL'){
+         const newPost = await this.prismaService.post.create({
+          data:{
+              title: data.title,
+              content: data.content,
+              city: data.city,
+              published: Boolean(data.published),
+              authorId: Number(data.authorId),
+              type: data.type
+          },
+        });
+        const pollPosts = await this.prismaService.poll.create({
+          data:{
+            postId: newPost.id,
+            pollOptions: data.pollOptions
+          }
+        })
+        if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+        const updateLog = await this.prismaService.log.create({
+          data:{
+              userId:Number(data.authorId),
+              message: `Poll is posted on app!`
+          }
+        })
+        if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return newPost;
+      }
+
     }
 
     async editPost(postData: PostEditDto,file: Express.Multer.File){

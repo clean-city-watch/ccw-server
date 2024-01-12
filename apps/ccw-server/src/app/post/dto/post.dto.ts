@@ -12,13 +12,14 @@ import { PostType } from '@prisma/client';
 export class PostCreateDto {
   @ApiProperty() title: string;
   @ApiProperty() content?: string;
-  // @ApiProperty({ type: 'string', format: 'binary' }) file: Express.Multer.File;
   @ApiProperty() city: string;
   @ApiProperty() published?: boolean;
-  @ApiProperty() latitude: string;
-  @ApiProperty() longitude: string;
+  @ApiProperty() latitude?: string;
+  @ApiProperty() longitude?: string;
   @ApiProperty() authorId: number;
   @ApiProperty() type: PostType;
+  @ApiProperty() question?: string;
+  @ApiProperty() pollOptions?: string[];
   @ApiProperty() organizationId?: number;
   @ApiProperty() communityId?: number;
 }

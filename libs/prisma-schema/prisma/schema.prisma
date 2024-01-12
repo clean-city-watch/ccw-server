@@ -157,29 +157,42 @@ model Post {
   id             Int      @id @default(autoincrement()) @map("id")
   title          String   @map("title")
   content        String?  @map("content")
-  imageUrl       String   @map("image_url")
+  imageUrl       String?  @map("image_url")
   city           String   @map("city")
-  latitude       Float    @map("latitude")
-  longitude      Float    @map("longitude")
+  latitude       Float?   @map("latitude")
+  longitude      Float?   @map("longitude")
   published      Boolean? @default(false) @map("published")
-  statusId       Int      @map("status_id")
+  statusId       Int?     @map("status_id")
   timestamp      DateTime @default(now()) @map("timestamp") @db.Timestamptz()
   authorId       Int      @map("author_id")
   type           PostType @map("type")
   organizationId Int?     @map("organization_id")
   communityId    Int?     @map("community_id")
+  question       String?  @map("question")
 
-  comments Comment[]
-  upvotes  Upvote[]
+  comments  Comment[]
+  upvotes   Upvote[]
+  polls     Poll[]
   // coords    Unsupported("geometry")?
   //  @@index([coords], map: "idx_posts_coords", type: Gist)
 
-  status       Status        @relation(fields: [statusId], references: [id])
+  status       Status?       @relation(fields: [statusId], references: [id])
   author       User?         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   community    Community?    @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
   @@map("posts")
+}
+
+model Poll {
+  id          Int      @id @default(autoincrement()) @map("id")
+  postId      Int      @map("post_id")
+  // Add fields specific to Poll
+  pollOptions String[] @map("poll_options")
+
+  post Post @relation(fields: [postId], references: [id])
+
+  @@map("polls")
 }
 
 model Status {

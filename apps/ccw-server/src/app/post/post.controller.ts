@@ -172,7 +172,7 @@ export default class PostController {
     @Post()
     async createDraft(
         @Body() postData: PostCreateDto,
-        @UploadedFile() file: Express.Multer.File
+        @UploadedFile() file?: Express.Multer.File
         // @UploadedFile(
         //     new ParseFilePipeBuilder()
         //     .addFileTypeValidator({
