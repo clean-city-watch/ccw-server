@@ -15,6 +15,7 @@ export class UserResponseDto{
 export class LoginUserResponse{
     @ApiProperty() id: string
     @ApiProperty() access_token: string
+    @ApiProperty() avatar: string
     // @ApiProperty()  email: string
     // @ApiProperty() timestamp: string
 }

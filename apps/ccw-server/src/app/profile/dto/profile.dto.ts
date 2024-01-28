@@ -1,3 +1,5 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class ProfileResponseDto {
     id: number;
     firstName: string;
@@ -7,4 +9,10 @@ export class ProfileResponseDto {
     addressLine2: string;
     avatar: string;
     userId: number;
+}
+
+
+export class ProfilePicUploadDto{
+    @ApiProperty() id: number
+    @ApiProperty() fileName: string
 }

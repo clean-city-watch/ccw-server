@@ -1,10 +1,45 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient ,Prisma} from '@prisma/client';
-import { ProfileResponseDto } from './dto/profile.dto';
+import { ProfilePicUploadDto, ProfileResponseDto } from './dto/profile.dto';
+import { MinioService } from '../minio/minio.service';
 
 @Injectable()
 export class ProfileService {
+    constructor(private minioService: MinioService){}
+
     private prismaService = new PrismaClient()
+
+    async editProfilePic(file:  Express.Multer.File, profilepicUploadDto: ProfilePicUploadDto){
+        
+        const profile = await this.prismaService.userProfile.findFirst({
+            where:{
+                userId: Number(profilepicUploadDto.id)
+            }
+        })
+
+        if(!profile) throw new HttpException("User Profile not found!", HttpStatus.NOT_FOUND);
+
+        if(profilepicUploadDto.fileName!=profile.avatar){
+
+            if(!file) throw new HttpException("Pleae upload file", HttpStatus.BAD_REQUEST);
+
+            if(profile.avatar!=null) {
+                await this.minioService.deleteFile(profile.avatar);
+            }
+
+            const avatarUrl = await this.minioService.uploadFile(file);
+            const updatedProfile  = await this.prismaService.userProfile.update({
+                data:{
+                    avatar: avatarUrl
+                },
+                where:{
+                    id: Number(profilepicUploadDto.id)
+                }
+            })
+            return updatedProfile
+        }
+
+    }
     
 
     async getProfile(id:number) : Promise<ProfileResponseDto>{
