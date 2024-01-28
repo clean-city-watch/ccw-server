@@ -9,7 +9,6 @@ export class PostService {
 
     private prismaService = new PrismaClient()
     async updateImage(id: number, postData: PostEditDto,file: Express.Multer.File){
-      console.log(postData);
       await this.minioService.createBucketIfNotExists()
       const post = await this.prismaService.post.findFirst({
         where:{
@@ -43,7 +42,8 @@ export class PostService {
 
       const allPostforCity = await this.prismaService.post.count({
         where:{
-          city: city !==undefined ? city: "Pune"
+          city: city !==undefined ? city: "Pune",
+          type: 'ISSUE'
         }
       })
 
@@ -51,6 +51,7 @@ export class PostService {
       const allResolvedcountforCity = await this.prismaService.post.count({
         where:{
           city: city !==undefined ? city: "Pune",
+          type: 'ISSUE',
           status:{
             name: 'Resolved'
           }
@@ -60,6 +61,7 @@ export class PostService {
       const allinProgresscountforCity = await this.prismaService.post.count({
         where:{
           city:city !==undefined ? city: "Pune",
+          type: 'ISSUE',
           status:{
             id: 2
           }
@@ -69,6 +71,7 @@ export class PostService {
       const allOpencountforCity = await this.prismaService.post.count({
         where:{
           city:city !==undefined ? city: "Pune",
+          type: 'ISSUE',
           status:{
             id: 1
           }
@@ -77,7 +80,8 @@ export class PostService {
 
       const latlangs = await this.prismaService.post.findMany({
         where:{
-          city:city !==undefined ? city: "Pune"
+          city:city !==undefined ? city: "Pune",
+          type: 'ISSUE',
         },
         select:{
           latitude: true,
