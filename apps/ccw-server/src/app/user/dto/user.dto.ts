@@ -16,6 +16,8 @@ export class LoginUserResponse{
     @ApiProperty() id: string
     @ApiProperty() access_token: string
     @ApiProperty() avatar: string
+    @ApiProperty() userLogin: boolean
+    @ApiProperty() orgManagerLogin: boolean
     // @ApiProperty()  email: string
     // @ApiProperty() timestamp: string
 }

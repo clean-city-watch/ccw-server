@@ -112,7 +112,9 @@ export class AuthService {
         return {
           id: String(user.id),
           access_token: await this.jwtService.signAsync(payload),
-          avatar: user.profile.avatar
+          avatar: user.profile.avatar,
+          userLogin: (payload.roles.super.length>0) ? true: false,
+          orgManagerLogin: (payload.roles.organization.length) ? true: false
         };
     
       }
