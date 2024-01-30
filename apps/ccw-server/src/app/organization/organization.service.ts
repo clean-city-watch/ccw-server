@@ -89,7 +89,19 @@ export class OrganizationService {
   }
 
 
-  getOrganizations() {
+  getOrganizations(myOrganization: string,userId: number) {
+    if(myOrganization=='true'){
+      return this.prismaService.organization.findMany({
+        where:{
+          users:{
+            some:{
+              id: userId
+            }
+          }
+        }
+      })
+    }
+
     return this.prismaService.organization.findMany({
 
     })

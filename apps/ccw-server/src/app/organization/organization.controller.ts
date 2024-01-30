@@ -57,11 +57,12 @@ export class OrganizationController {
   }
 
 
-  @ApiOperation({ summary: 'Get all the users for leadboard' })
+  @ApiOperation({ summary: 'Get all the users for organization' })
+  @ApiQuery({ name: 'myOrganization', required: false })
   @ApiResponse({ status: 200, description: 'Success', type: [OrganizationResponseDto] })
   @Get()
-  async getOrganizations() {
-    return this.organizationService.getOrganizations();
+  async getOrganizations( @Query('myOrganization') myOrganization: string,@Request() req) {
+    return this.organizationService.getOrganizations(myOrganization,req['user'].sub);
   }
 
 
