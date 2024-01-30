@@ -116,6 +116,178 @@ export class OrganizationService {
 
 
   async getProfile(id: number, userId: number) {
+    const openposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 1,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    const returnCount = {};
+    
+    if(openposts.length!=0){
+      returnCount['open'] = openposts[0].posts.length
+    }else{
+      returnCount['open'] = 0
+    }
+    const inprogressposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 2,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(inprogressposts.length!=0){
+      returnCount['inprogress'] = inprogressposts[0].posts.length
+    }else{
+      returnCount['inprogress'] = 0
+    }
+    const inreviewposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 3,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(inreviewposts.length!=0){
+      returnCount['inreview'] =inreviewposts[0].posts.length
+    }else{
+      returnCount['inreview'] = 0
+    }
+    const resolvedposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 4,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(resolvedposts.length!=0){
+      returnCount['resolved'] =resolvedposts[0].posts.length
+    }else{
+      returnCount['resolved'] = 0
+    }
+    const reopenposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 5,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(reopenposts.length!=0){
+      returnCount['reopen'] =reopenposts[0].posts.length
+    }else{
+      returnCount['reopen'] = 0
+    }
+    const onholdposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 6,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(onholdposts.length!=0){
+      returnCount['onhold'] =onholdposts[0].posts.length
+    }else{
+      returnCount['onhold'] = 0
+    }
+    const invalidposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 7,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(invalidposts.length!=0){
+      returnCount['invalid'] =invalidposts[0].posts.length
+    }else{
+      returnCount['invalid'] = 0
+    }
+    const blockedposts = await  this.prismaService.user.findMany({
+      select:{
+        posts:{
+          select:{
+            id: true
+          },
+          where:{
+            statusId: 8,
+            organizationId: id
+          }
+        }
+      },
+      where:{
+        id: userId
+      }
+    });
+    if(blockedposts.length!=0){
+      returnCount['blocked'] =blockedposts[0].posts.length
+    }else{
+      returnCount['blocked'] = 0
+    }
+
+
     const isUserInOrganization = await this.prismaService.userOrganizationRole.findFirst({
       where: {
         userId: userId,
@@ -149,7 +321,7 @@ export class OrganizationService {
         }
       }
     });
-    const data = { isOrganizationUser: isUserInOrganization ? true : false, ...organization }
+    const data = { isOrganizationUser: isUserInOrganization ? true : false, ...returnCount,...organization }
     console.log(data);
     return data
   }

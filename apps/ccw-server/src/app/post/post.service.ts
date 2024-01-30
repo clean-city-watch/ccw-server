@@ -210,6 +210,7 @@ export class PostService {
       let whereQuery = {};
   
       //TODO: just uncomment and you will get for and query in findmany
+      whereArray.push({type: "ISSUE"})
       if(self !== undefined){
         whereArray.push({ authorId :  userId  });
       }
