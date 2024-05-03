@@ -202,6 +202,7 @@ export class PostService {
       title: string,
       content: string,
       userId: number,
+      type: string,
       self: boolean,
       sortBy: string,
       sortOrder: 'asc' | 'desc'
@@ -210,7 +211,7 @@ export class PostService {
       let whereQuery = {};
   
       //TODO: just uncomment and you will get for and query in findmany
-      whereArray.push({type: "ISSUE"})
+      whereArray.push({type:type})
       if(self !== undefined){
         whereArray.push({ authorId :  userId  });
       }

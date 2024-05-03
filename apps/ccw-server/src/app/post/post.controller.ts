@@ -96,6 +96,7 @@ export default class PostController {
         @Query('title') title?: string,
         @Query('content') content?: string,
         @Query('userId') userId?: string,
+        @Query('type') type?: string,
         @Query('self') self?: boolean,
         @Query('sortBy') sortBy?: string,
         @Query('sortOrder') sortOrder?: 'asc' | 'desc'
@@ -107,6 +108,7 @@ export default class PostController {
           title,
           content,
           +userId,
+          type,
           self,
           sortBy,
           sortOrder
