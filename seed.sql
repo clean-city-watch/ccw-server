@@ -1,11 +1,11 @@
-insert into statuses (name) values ('Open');
-insert into statuses (name) values ('In Progress');
-insert into statuses (name) values ('In Review');
-insert into statuses (name) values ('Resolved');
-insert into statuses (name) values ('Reopened');
-insert into statuses (name) values ('On Hold');
-insert into statuses (name) values ('Invalid');
-insert into statuses (name) values ('Blocked');
+INSERT INTO statuses (name) VALUES ('Open');
+INSERT INTO statuses (name) VALUES ('In Progress');
+INSERT INTO statuses (name) VALUES ('In Review');
+INSERT INTO statuses (name) VALUES ('Resolved');
+INSERT INTO statuses (name) VALUES ('Reopened');
+INSERT INTO statuses (name) VALUES ('On Hold');
+INSERT INTO statuses (name) VALUES ('Invalid');
+INSERT INTO statuses (name) VALUES ('Blocked');
 
 INSERT INTO public.users(email,  password) VALUES ( 'admin@gmail.com', '$2b$10$ObLxqeKtG0bSmrDLyI64Y.L.LJe/k33g4sVFsft5gDmHYId7uH/7G');
 INSERT INTO public.user_profiles (user_id) VALUES (1);

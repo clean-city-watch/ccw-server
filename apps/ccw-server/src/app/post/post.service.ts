@@ -490,6 +490,16 @@ export class PostService {
   
    async createPost(data: PostCreateDto,file: Express.Multer.File): Promise<PostResponseDto> {
 
+      const userProfile = await this.prismaService.userProfile.findFirst({
+        where:{
+          userId: Number(data.authorId)
+        }
+      })
+
+      if(userProfile.firstName==null && userProfile.LastName==null && userProfile.avatar==null && userProfile.addressLine1 ==null && userProfile.addressLine2==null){
+        throw new HttpException("Please update profile before uploading post",HttpStatus.BAD_REQUEST);
+      }
+
       if(data.type=='QUESTION'){
         console.log('question modal called');
         const newPost = await this.prismaService.post.create({
