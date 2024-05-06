@@ -205,7 +205,8 @@ export class PostService {
       type: string,
       self: boolean,
       sortBy: string,
-      sortOrder: 'asc' | 'desc'
+      sortOrder: 'asc' | 'desc',
+      organizationId: number
     ): Promise<FilterPostsResponseDto> {
       const whereArray = [];
       let whereQuery = {};
@@ -226,6 +227,12 @@ export class PostService {
 
       if (content !== undefined) {
         whereArray.push({ content: { contains: content } });
+      }
+
+      if(organizationId !==undefined){
+        whereArray.push({
+          organizationId: Number(organizationId)
+        })
       }
   
       if (whereArray.length > 0) {

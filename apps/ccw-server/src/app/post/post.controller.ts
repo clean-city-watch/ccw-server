@@ -99,7 +99,8 @@ export default class PostController {
         @Query('type') type?: string,
         @Query('self') self?: boolean,
         @Query('sortBy') sortBy?: string,
-        @Query('sortOrder') sortOrder?: 'asc' | 'desc'
+        @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+        @Query('organizationId') organizationId?: number,
       ): Promise<FilterPostsResponseDto> {
         return  this.postService.getFilteredPosts(
           +pageSize,
@@ -111,7 +112,8 @@ export default class PostController {
           type,
           self,
           sortBy,
-          sortOrder
+          sortOrder,
+          organizationId
         );
        
       }
