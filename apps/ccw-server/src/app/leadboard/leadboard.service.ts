@@ -8,23 +8,28 @@ export class LeadboardService {
     private prismaService = new PrismaClient()
 
     getLeadUsers(){
-        return this.prismaService.user.findMany({
+      return this.prismaService.user.findMany({
+        select:{
+          id : true,
+          profile:{
             select:{
-                id : true,
-                profile:{
-                    select:{
-                        firstName: true,
-                        LastName: true,
-                        
-                    }
-                }
-            },
-            orderBy: {
-              coins: {
-                coins: 'asc'
-              },
-            },
-          });
-
+              firstName: true,
+              LastName: true,
+            }
+          }
+        },
+        where: {
+          AND: [
+            { profile: { firstName: { not: null } } },
+            { profile: { LastName: { not: null } } }
+          ]
+        },
+        orderBy: {
+          coins: {
+            coins: 'asc'
+          },
+        },
+      });
     }
+    
 }
