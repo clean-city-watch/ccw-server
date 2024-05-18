@@ -21,7 +21,7 @@ export class AuthService {
     
     comparePasswords(
         plainPassword: string,
-        hashedPassword: string
+        hashedPassword: string  
         ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
     }

@@ -10,16 +10,18 @@ import {
     HttpCode,
     HttpStatus,
     UseGuards,
+    Put,
   } from '@nestjs/common';
 import {
     ApiBody,
+    ApiOkResponse,
     ApiOperation,
     ApiParam,
     ApiResponse,
     ApiTags,
   } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { CreateUserDto, LoginUserResponse, UserResponseDto } from './dto/user.dto';
+import { CreateUserDto, ForgotPasswordDto, ForgotPasswordResponseDTO, LoginUserResponse, UpdatePasswordDto, UserResponseDto } from './dto/user.dto';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { AuthGuard } from '../core/auth/auth.guard';
 import { RolesGuard } from '../core/auth/roles.guard';
@@ -91,6 +93,21 @@ export class UserController {
     @HttpCode(HttpStatus.NO_CONTENT)
     deleteUser(@Param('id') id: number) {
         return this.userService.deleteUser({id:Number(id)})
+    }
+
+    @Post('forgot-password')
+    @ApiOkResponse({ type: ForgotPasswordResponseDTO })
+    @HttpCode(HttpStatus.ACCEPTED)
+    forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto){
+        return this.userService.forgotPassword(forgotPasswordDto);
+    }
+
+
+    @Put('update-password/email/:emailId/token/:token')
+    @ApiOkResponse({ type: UserResponseDto })
+    @HttpCode(HttpStatus.CREATED)
+    updatePassword(@Body() updatePasswordDto: UpdatePasswordDto){
+        return this.userService.updatePassword(updatePasswordDto);
     }
 
 //https://youtu.be/qlELLikT3FU

@@ -121,6 +121,7 @@ model User {
   email     String   @unique @map("email")
   password  String   @map("password")
   otp       String?  @map("otp")
+  token     String?  @map("token")
   timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz()
 
   profile           UserProfile?
