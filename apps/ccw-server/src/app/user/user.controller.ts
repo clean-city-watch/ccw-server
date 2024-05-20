@@ -95,14 +95,16 @@ export class UserController {
         return this.userService.deleteUser({id:Number(id)})
     }
 
+    @Public()
     @Post('forgot-password')
     @ApiOkResponse({ type: ForgotPasswordResponseDTO })
-    @HttpCode(HttpStatus.ACCEPTED)
+    @HttpCode(HttpStatus.OK)
     forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto){
         return this.userService.forgotPassword(forgotPasswordDto);
     }
 
 
+    @Public()
     @Put('update-password/email/:emailId/token/:token')
     @ApiOkResponse({ type: UserResponseDto })
     @HttpCode(HttpStatus.CREATED)

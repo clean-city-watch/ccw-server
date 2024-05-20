@@ -197,6 +197,7 @@ async getCount(){
       },
     });
 
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -221,7 +222,7 @@ async getCount(){
 
 
     const templateContent = await fs.readFile(
-      'apps/api/src/assets/templates/forgot-password-template.ejs',
+      'apps/ccw-server/src/assets/templates/forgot-password-template.ejs',
       'utf-8'
     );
     const message = ejs.render(templateContent, {
@@ -241,6 +242,10 @@ async getCount(){
         'there is some problem while sending mail',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+    console.log({
+      email: updateUserToken.email,
+      token: token,
+    })
 
     return {
       email: updateUserToken.email,
@@ -298,7 +303,7 @@ async getCount(){
     });
 
     const templateContent = await fs.readFile(
-      'apps/api/src/assets/templates/update-password-template.ejs',
+      'apps/ccw-server/src/assets/templates/update-password-template.ejs',
       'utf-8'
     );
     const message = ejs.render(templateContent, {
