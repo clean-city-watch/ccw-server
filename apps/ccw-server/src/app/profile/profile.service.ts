@@ -36,6 +36,13 @@ export class ProfileService {
                     id: Number(profilepicUploadDto.id)
                 }
             })
+            const updateLog = await this.prismaService.log.create({
+                data:{
+                    userId:Number(profilepicUploadDto.id),
+                    message: "Profile updated successfully!"
+                }
+            })
+            if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
             return updatedProfile
         }
 

@@ -21,7 +21,7 @@ import {
     ApiTags,
   } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { CreateUserDto, ForgotPasswordDto, ForgotPasswordResponseDTO, LoginUserResponse, UpdatePasswordDto, UserResponseDto } from './dto/user.dto';
+import { CreateUserDto, ForgotPasswordDto, ForgotPasswordResponseDTO, LoginUserResponse, SignUpUserDto, SignUpUserResponseDto, UpdatePasswordDto, UserResponseDto } from './dto/user.dto';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { AuthGuard } from '../core/auth/auth.guard';
 import { RolesGuard } from '../core/auth/roles.guard';
@@ -71,17 +71,17 @@ export class UserController {
 
     @Public()
     @ApiOperation({ summary: 'Create user' })
-    @ApiBody({ type: CreateUserDto })
+    @ApiBody({ type: SignUpUserDto })
     @ApiResponse({
         status: 201,
         description: 'Success',
-        type: UserResponseDto,
+        type: SignUpUserResponseDto,
     })
     @HttpCode(HttpStatus.CREATED)
     @Post('user/signup')
     async signupUser(
-        @Body() userData: CreateUserDto,
-    ): Promise<UserResponseDto> {
+        @Body() userData: SignUpUserDto,
+    ): Promise<SignUpUserResponseDto> {
         return this.userService.createUser(userData);
     }
 

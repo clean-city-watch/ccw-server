@@ -119,7 +119,7 @@ model UserSuperRole {
 model User {
   id        Int      @id @default(autoincrement()) @map("id")
   email     String   @unique @map("email")
-  password  String   @map("password")
+  password  String?   @map("password")
   otp       String?  @map("otp")
   token     String?  @map("token")
   timestamp DateTime @default(now()) @map("timestamp") @db.Timestamptz()
