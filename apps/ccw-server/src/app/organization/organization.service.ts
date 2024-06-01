@@ -2,9 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { CreateOrganizationDto, UserOrgRelationDto } from './dto/organization.dto';
 import { UserResponseDto } from '../user/dto/user.dto';
+import { MinioService } from '../minio/minio.service';
 
 @Injectable()
 export class OrganizationService {
+  constructor(private readonly minioService: MinioService){}
+
   private prismaService = new PrismaClient()
 
   async createUsersRelationForOrganization(organizationId: number, userOrgRelationDto: UserOrgRelationDto) {
@@ -108,9 +111,24 @@ export class OrganizationService {
   }
 
 
-  async create(createOrganizationDto: CreateOrganizationDto) {
+  async create(createOrganizationDto: CreateOrganizationDto,file: Express.Multer.File) {
+    await this.minioService.createBucketIfNotExists();
+    const imageurl = await this.minioService.uploadFile(file);
+
     return this.prismaService.organization.create({
-      data: createOrganizationDto,
+      data: {
+        name: createOrganizationDto.name,
+        email: createOrganizationDto.email,
+        type: createOrganizationDto.type,
+        phoneNumber: createOrganizationDto.phoneNumber,
+        addressLine1: createOrganizationDto.addressLine1,
+        addressLine2: createOrganizationDto.addressLine2,
+        city: createOrganizationDto.city,
+        postalCode: createOrganizationDto.postalCode,
+        countryCode: createOrganizationDto.countryCode,
+        stateCode: createOrganizationDto.stateCode,
+        logo: imageurl
+      },
     });
   }
 

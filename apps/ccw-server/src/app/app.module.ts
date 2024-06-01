@@ -20,6 +20,7 @@ import { OrganizationService } from './organization/organization.service';
 import { NotificationModule } from './notification/notification.module';
 import { MinioService } from './minio/minio.service';
 import { MinioModule } from './minio/minio.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -43,6 +44,8 @@ import { MinioModule } from './minio/minio.module';
   providers: [
     AppService,
     LogService,
+    MinioService,
+    ConfigService,
     LeadboardService,
     GreenCoinService,
     OrganizationService,

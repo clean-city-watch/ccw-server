@@ -52,9 +52,6 @@ export class CreateOrganizationDto {
   @IsString()
   stateCode?: string;
 
-  @ApiProperty()
-  @IsString()
-  logo: string;
 }
 
 

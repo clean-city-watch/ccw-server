@@ -10,6 +10,8 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -24,6 +26,7 @@ import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto, OrganizationResponseDto, UserOrgRelationDto } from './dto/organization.dto';
 import { UserResponseDto } from '../user/dto/user.dto';
 import { Public } from '../core/auth/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @ApiTags('organization')
@@ -75,6 +78,7 @@ export class OrganizationController {
 
   @ApiOperation({ summary: 'Create organization' })
   @ApiBody({ type: CreateOrganizationDto })
+  @UseInterceptors(FileInterceptor('file'))
   @ApiResponse({
     status: 201,
     description: 'Organization created successfully',
@@ -84,9 +88,11 @@ export class OrganizationController {
   @Post('create')
   async create(
     @Body() createOrganizationDto: CreateOrganizationDto,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<OrganizationResponseDto> {
     const organization = await this.organizationService.create(
       createOrganizationDto,
+      file
     );
     return organization;
   }
