@@ -212,7 +212,11 @@ export class PostService {
       let whereQuery = {};
   
       //TODO: just uncomment and you will get for and query in findmany
-      whereArray.push({type:type})
+      
+      if(type !== undefined){
+        whereArray.push({type:type})
+      }
+
       if(self !== undefined){
         whereArray.push({ authorId :  userId  });
       }
@@ -244,8 +248,8 @@ export class PostService {
       }
       console.log(whereQuery);
   
-      const sort = (sortBy ? sortBy : 'id').toString();
-      const order = sortOrder ? sortOrder : 'asc';
+      const sort = (sortBy ? sortBy : 'timestamp').toString();
+      const order = sortOrder ? sortOrder : 'desc';
       const size = pageSize ? pageSize : 10;
       const offset = pageOffset ? pageOffset : 0;
       const orderBy = { [sort]: order };
@@ -590,6 +594,42 @@ export class PostService {
               userId:Number(data.authorId),
               message: `Poll is posted on app!`
           }
+        })
+        if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return newPost;
+      }else{
+
+        await this.minioService.createBucketIfNotExists();
+        const imageurl = await this.minioService.uploadFile(file);
+        // console.log(imageurl);
+        console.log(data);
+
+        const postData = {
+            title: data.title,
+            content: data.content,
+            imageUrl: imageurl,
+            city: data.city,
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
+            published: Boolean(data.published),
+            authorId: Number(data.authorId),
+            type: data.type,
+        }
+
+        if(data.organizationId !== undefined){
+          postData['organizationId'] = Number(data.organizationId)
+        }
+
+        const newPost = await this.prismaService.post.create({
+          data: postData,
+        });
+        if(!newPost)  throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
+          const updateLog = await this.prismaService.log.create({
+            data:{
+                userId:Number(data.authorId),
+                message: `Post uploaded successfully!`
+            }
         })
         if(!updateLog) throw new HttpException("log is not updated",HttpStatus.INTERNAL_SERVER_ERROR);
 
