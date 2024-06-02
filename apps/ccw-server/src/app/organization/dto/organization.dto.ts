@@ -2,7 +2,7 @@
 import { IsString, IsEmail, IsOptional } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { OrganizationRoleName } from '@prisma/client';
+import { OrganizationRoleName, PostType, Status } from '@prisma/client';
 
 export class CreateOrganizationDto {
     @ApiProperty()
@@ -100,5 +100,19 @@ export class OrganizationResponseDto {
 export class UserOrgRelationDto{
   @ApiProperty() userEmail: string;
   @ApiProperty() role: OrganizationRoleName ;
+
+}
+
+
+
+
+export class PatchIssueDto{
+  @ApiProperty() issueNumber: string;
+  @ApiProperty() status: string ;
+
+}
+
+export class AddIssueDto{
+  @ApiProperty() issueNumber: string;
 
 }

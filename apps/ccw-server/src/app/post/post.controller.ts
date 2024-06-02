@@ -127,6 +127,16 @@ export default class PostController {
         return this.postService.getpostbyid(+id);
     }
 
+    @ApiOperation({ summary: 'Get all issues' })
+    @ApiResponse({ status: 200, description: 'Success', type: PostResponseDto })
+    @Get('issue-ids')
+    getissuesbyid(){
+        return this.postService.getissuesbyid();
+    }
+
+
+
+
 
     
 

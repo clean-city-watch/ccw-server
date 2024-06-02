@@ -104,6 +104,24 @@ export class PostService {
     }
 
 
+    async getissuesbyid( ){
+      
+      const issueIds = await this.prismaService.post.findMany({
+        select:{
+          id:true
+        },
+        where:{
+          organizationId: null
+        }
+      })
+
+      console.log(issueIds);
+      return issueIds;
+
+
+    }
+
+
     getpostbyid(id:number){
       return this.prismaService.post.findFirst({
         include: {
