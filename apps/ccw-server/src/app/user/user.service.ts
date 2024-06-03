@@ -68,7 +68,7 @@ export class UserService {
     if (existingUser && existingUser.password) throw new HttpException("user already exist please signin", HttpStatus.BAD_REQUEST)
 
     const fullName = createUserDto['FullName'].split(" ");
-    if (fullName.length != 2) {
+    if (fullName.length < 2) {
       throw new HttpException("Invalid Full Name use space between firstname and lastname", HttpStatus.BAD_REQUEST)
     }
 
